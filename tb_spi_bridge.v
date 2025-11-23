@@ -35,7 +35,7 @@ module tb_spi_bridge_comprehensive;
     );
 
     initial clk = 0;
-    always #5 clk = ~clk;
+    always #50 clk = ~clk;
 
     always @(posedge clk) begin
         if (byte_sync) begin
@@ -52,29 +52,29 @@ module tb_spi_bridge_comprehensive;
         begin
             if (start_cs) begin
                 cs_n = 0;
-                #100;
+                #1000;
             end
 
             miso_captured_byte = 0;
 
             for (i = 7; i >= 0; i = i - 1) begin
                 mosi = byte_to_send[i];
-                #100;
+                #1000;
 
                 sclk = 1;
-                #50;
+                #500;
                 miso_captured_byte[i] = miso;
-                #50;
+                #500;
 
                 sclk = 0;
-                #100;
+                #1000;
             end
 
             if (end_cs) begin
-                #100;
+                #1000;
                 cs_n = 1;
                 mosi = 0;
-                #100;
+                #1000;
             end
         end
     endtask
@@ -85,20 +85,20 @@ module tb_spi_bridge_comprehensive;
         integer i;
         begin
             cs_n = 0;
-            #100;
+            #1000;
 
             for (i = 7; i >= 0; i = i - 1) begin
                 mosi = byte_to_send[i];
-                #100;
+                #1000;
                 sclk = 1;
-                #100;
+                #1000;
                 sclk = 0;
-                #100;
+                #1000;
 
                 if (i == abort_at_bit) begin
                     cs_n = 1;
                     mosi = 0;
-                    #200;
+                    #2000;
                     i = -1;
                 end
             end
@@ -311,15 +311,15 @@ module tb_spi_bridge_comprehensive;
         byte_sync_detected = 0;
         data_out = 8'h12;
         cs_n = 0;
-        #100;
+        #1000;
 
-        mosi = 1; #100; sclk = 1; #100; sclk = 0; #100;
-        mosi = 0; #100; sclk = 1; #100; sclk = 0; #100;
+        mosi = 1; #1000; sclk = 1; #1000; sclk = 0; #1000;
+        mosi = 0; #1000; sclk = 1; #1000; sclk = 0; #1000;
 
         rst_n = 0;
-        #50;
+        #500;
         rst_n = 1;
-        #200;
+        #2000;
 
         cs_n = 1;
         if (!byte_sync_detected) begin

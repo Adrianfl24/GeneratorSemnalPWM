@@ -12,48 +12,34 @@ module pwm_gen (
     // top facing signals
     output pwm_out
 );
-    reg r_pwm;
-    assign pwm_out = r_pwm;
-
     wire align_mode = functions[1]; // 0 = aliniat, 1 = nealiniat
     wire align_right = functions[0]; // 0 = left, 1 = right
 
-    // logica pwm
-    always @(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
-            r_pwm <= 1'b0;
-        end else begin
-            // daca pwm e dezactivat, nu schimbam iesirea
-            if (!pwm_en) begin
-                r_pwm <= r_pwm; // ramane blocat
-            end else begin
+    reg r_pwm;
 
-                if(!align_mode) begin
-                    if(count_val == 16'd0) begin
-                        // mod alinmiat
-                        // left aligned -> incepe pe 1
-                        // right aligned -> incepe pe 0
-                        r_pwm <= (align_right ? 1'b0 : 1'b1);
-                    end else if (count_val == compare1) begin
-                        r_pwm <= ~r_pwm;
-                    end
+    always @(*) begin
+        if (!pwm_en) begin
+            r_pwm = 1'b0;
+        end else begin
+            if (!align_mode) begin
+                if (count_val < compare1) begin
+                    // inainte de compare1
+                    r_pwm = (align_right ? 1'b0 : 1'b1);
+                end else begin
+                    // la sau dupa compare1 (inclusiv)
+                    r_pwm = (align_right ? 1'b1 : 1'b0);
                 end
-                else begin
-                    // mod nealiniat -> incepe mereu pe 0
-                    if (count_val == 0) begin
-                        r_pwm <= 1'b0;
-                    end
-                    // mod nealiniat
-                    // 0 trece in 1 la compare1
-                    // 1 trece in 0 la compare2
-                    else if (count_val == compare1) begin
-                        r_pwm <= 1'b1;
-                    end
-                    else if (count_val == compare2) begin
-                        r_pwm <= 1'b0;
-                    end
+            end else begin
+                if (count_val < compare1) begin
+                    r_pwm = 1'b0;
+                end else if (count_val < compare2) begin
+                    r_pwm = 1'b1;
+                end else begin
+                    r_pwm = 1'b0;
                 end
             end
         end
     end
+
+    assign pwm_out = r_pwm;
 endmodule

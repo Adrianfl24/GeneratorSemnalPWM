@@ -4,8 +4,8 @@ module tb_top;
     // Semnale SPI (master)
     reg sclk;
     reg cs_n;
-    reg miso;
-    wire mosi;
+    reg miso;  // Din cauza conventiei inversate in top.v (input miso)
+    wire mosi; // Din cauza conventiei inversate in top.v (output mosi)
 
     // Semnale sistem
     reg clk;
@@ -20,8 +20,8 @@ module tb_top;
         .rst_n(rst_n),
         .sclk(sclk),
         .cs_n(cs_n),
-        .miso(miso),
-        .mosi(mosi),
+        .miso(miso),  // TB citește miso (wire) <- DUT output
+        .mosi(mosi),  // TB scrie mosi (reg) -> DUT input
         .pwm_out(pwm_out)
     );
 
@@ -33,37 +33,39 @@ module tb_top;
     // TASK-URI PENTRU COMUNICAȚIE SPI
     // ========================================================
 
-    // Trimite 1 bit pe SPI (CPOL=0, CPHA=0)
-    task spi_send_bit(input bit_val);
-        begin
-            sclk = 0;
-            miso = bit_val;     // Data pe falling edge
-            #50;                // Half period
-            sclk = 1;           // Rising edge - slave samples
-            #50;                // Half period
-        end
-    endtask
-
-    // Trimite 1 byte pe SPI (MSB first)
+    // Trimite 1 byte pe SPI (MSB first) - Scrierea către slave
     task spi_send_byte(input [7:0] data);
         integer i;
         begin
             for (i = 7; i >= 0; i = i - 1) begin
-                spi_send_bit(data[i]);
+                miso = data[i];  // TB scrie pe miso (care merge la top.miso INPUT)
+                #1000;
+                
+                sclk = 1;
+                #500;
+                #500;
+                
+                sclk = 0;
+                #1000;
             end
         end
     endtask
 
-    // Citește 1 byte de pe SPI (MSB first)
+    // Citește 1 byte de pe SPI (MSB first) - Citirea de la slave
     task spi_read_byte(output [7:0] data);
         integer i;
         begin
             for (i = 7; i >= 0; i = i - 1) begin
-                sclk = 0;
-                #50;
+                miso = 0;  // TB nu trimite date când citește
+                #1000;
+                
                 sclk = 1;
-                data[i] = mosi;  // Sample pe rising edge
-                #50;
+                #500;
+                data[i] = mosi;  // TB citește de pe mosi (care vine de la top.mosi OUTPUT)
+                #500;
+                
+                sclk = 0;
+                #1000;
             end
         end
     endtask
@@ -77,7 +79,7 @@ module tb_top;
         begin
             // Activează slave
             cs_n = 0;
-            #100;
+            #1000;
 
             // Byte 1: Comandă (Write=1, H/L, Address)
             spi_send_byte({1'b1, high_low, addr});
@@ -87,9 +89,9 @@ module tb_top;
 
             // Dezactivează slave
             sclk = 0;
-            #100;
+            #1000;
             cs_n = 1;
-            #200;  // Delay între tranzacții
+            #2000;  // Delay între tranzacții
         end
     endtask
 
@@ -116,7 +118,7 @@ module tb_top;
     );
         begin
             cs_n = 0;
-            #100;
+            #1000;
 
             // Byte 1: Comandă (Read=0, H/L, Address)
             spi_send_byte({1'b0, high_low, addr});
@@ -125,9 +127,9 @@ module tb_top;
             spi_read_byte(data);
 
             sclk = 0;
-            #100;
+            #1000;
             cs_n = 1;
-            #200;
+            #2000;
         end
     endtask
 
@@ -225,10 +227,12 @@ module tb_top;
         wait_clk(5);
         check("PWM = 1 la start (left aligned)", pwm_out == 1'b1);
 
-        wait_clk(12);  // Așteaptă să ajungă la COMPARE1
+        // Așteaptă să ajungă la COMPARE1 (count_val = 10)
+        repeat(12) @(posedge clk);
         check("PWM = 0 după COMPARE1", pwm_out == 1'b0);
 
-        wait_clk(15);  // Așteaptă overflow
+        // Așteaptă overflow (counter revine la 0)
+        repeat(12) @(posedge clk);  // 10 + 12 = 22, deci am trecut de 20 (overflow)
         check("PWM = 1 după overflow", pwm_out == 1'b1);
 
         $display("");
@@ -254,10 +258,12 @@ module tb_top;
         wait_clk(5);
         check("PWM = 0 la start (right aligned)", pwm_out == 1'b0);
 
-        wait_clk(12);
+        // Așteaptă să ajungă la COMPARE1 (count_val = 10)
+        repeat(12) @(posedge clk);
         check("PWM = 1 după COMPARE1", pwm_out == 1'b1);
 
-        wait_clk(15);
+        // Așteaptă overflow (counter revine la 0)
+        repeat(12) @(posedge clk);  // 10 + 12 = 22, deci am trecut de 20 (overflow)
         check("PWM = 0 după overflow", pwm_out == 1'b0);
 
         $display("");
@@ -360,7 +366,7 @@ module tb_top;
         // ====================================
         // TEST 8: Duty cycle diferite
         // ====================================
-        $display("TEST 8: Duty Cycles - 25%, 50%, 75%");
+        $display("TEST 8: Duty Cycles - 25%%, 50%%, 75%%");
         $display("------------------------------------");
 
         // 25% duty
@@ -422,7 +428,7 @@ module tb_top;
 
     // Timeout
     initial begin
-        #1000000;  // 1ms timeout
+        #200000000;  // 200ms timeout
         $display("\n✗ TIMEOUT!");
         $finish;
     end

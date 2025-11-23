@@ -45,7 +45,7 @@ module tb_regs;
         .compare2(compare2)
     );
 
-    always #5 clk = ~clk;
+    always #50 clk = ~clk;
 
     task write_reg(input [5:0] a, input [7:0] d);
         begin

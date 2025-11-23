@@ -12,27 +12,27 @@ module spi_bridge (
     output[7:0] data_in,
     input[7:0] data_out
 );
-    // Declaram registrii pentru a folosi in blocurile always
+    // declar registrii pentru a folosi in blocurile always
     reg r_miso;
     reg r_byte_sync;
     reg [7:0] r_data_in;
 
-    // Legam registrele interne la iesirile modulului
+    // legan registrele interne la iesirile modulului
     assign miso = r_miso;
     assign byte_sync = r_byte_sync;
     assign data_in = r_data_in;
 
-    // Variabile interne folosite pentru logica
-    reg [2:0] bit_cnt;      // Numara de la 0 la 7 (counter)
-    reg [7:0] shift_reg;    // Colecteaza datele de la MOSI
-    reg sclk_prev;          // Retine starea anterioara a sclk pentru detectie front
+    // variabile interne folosite pentru logica
+    reg [2:0] bit_cnt; // numara de la 0 la 7 (counter)
+    reg [7:0] shift_reg; // retine datele de la MOSI
+    reg sclk_prev; // retine starea anterioara a sclk
 
     wire sclk_rise = (sclk == 1) && (sclk_prev == 0);
     wire sclk_fall = (sclk == 0) && (sclk_prev == 1);
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            // Resetam
+            // reset
             sclk_prev <= 0;
             r_miso <= 0;
             r_byte_sync <= 0;
@@ -51,6 +51,11 @@ module spi_bridge (
                 bit_cnt <= 0;
             end
             else begin
+                // stan MISO pentru primul bit cand CS este activ si bit_cnt = 0
+                if (bit_cnt == 0 && !sclk) begin
+                    r_miso <= data_out[7];
+                end
+
                 if(sclk_rise) begin
                     // pastram ultimii 7 biti si adaugam ultimul bit la sfarsit
                     shift_reg <= {shift_reg[6:0], mosi};
@@ -69,15 +74,10 @@ module spi_bridge (
 
                 if(sclk_fall) begin
                     // trimitem bit-ul corect din data_out MSB first
-                    // cabd bit_cnt este 0, trimitem bitul 7. cand e 1, trimitem 6.
+                    // cand bit_cnt este 0, trimitem bitul 7. cand e 1, trimitem 6.
                     // (formula este deci: 7 - bit_cnt)
-
                     r_miso <= data_out[7 - bit_cnt];
                 end
-                else if (bit_cnt == 0 && !sclk) begin
-                    r_miso <= data_out[7];
-                end
-
             end
         end
     end

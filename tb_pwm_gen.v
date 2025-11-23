@@ -27,8 +27,8 @@ module tb_pwm_gen;
         .pwm_out(pwm_out)
     );
 
-    // clock (10ns)
-    always #5 clk = ~clk;
+    // clock (100ns = 10MHz)
+    always #50 clk = ~clk;
 
     // TASKURI -----------------------------------------------------
 

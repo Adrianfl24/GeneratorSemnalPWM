@@ -21,7 +21,10 @@ module counter (
     wire[15:0] psc_limit = (16'd1 << prescale);
 
     always @(posedge clk or negedge rst_n) begin
-        if(!rst_n || count_reset) begin
+        if(!rst_n) begin
+            r_count <= 16'd0;
+            r_psc <= 16'd0;
+        end else if(count_reset) begin
             r_count <= 16'd0;
             r_psc <= 16'd0;
         end else begin
@@ -36,13 +39,13 @@ module counter (
 
                     if(upnotdown) begin
                         if (r_count == period)
-                            r_count <= 16'd0;    // overflow, deci reia de la 0
+                            r_count <= 16'd0; // overflow, deci reia de la 0
                         else
                             r_count <= r_count + 16'd1;
                     end
                     else begin
                         if (r_count == 0)
-                            r_count <= period;   // underflow deci, sarim la PERIOD
+                            r_count <= period; // underflow deci, sarim la PERIOD
                         else
                             r_count <= r_count - 16'd1;
                     end

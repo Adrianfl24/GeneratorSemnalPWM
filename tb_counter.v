@@ -25,8 +25,8 @@ module tb_counter;
         .prescale(prescale)
     );
 
-    // Clock 10ns
-    always #5 clk = ~clk;
+    // Clock 100ns = 10MHz
+    always #50 clk = ~clk;
 
     // TASKURI ---------------------------------------------------
 
