@@ -24,10 +24,10 @@ Pentru a simula proiectul, ai nevoie de următoarele unelte open-source:
 3.  **Make**: Pentru rularea automată a comenzilor.
 
 ### Instalare pe Linux (Ubuntu/Debian)
-\`\`\`bash
+```bash
 sudo apt-get update
 sudo apt-get install iverilog gtkwave make
-\`\`\`
+```
 
 ### Instalare pe Windows
 Se recomandă instalarea [Icarus Verilog for Windows](https://bleyer.org/icarus/) (include și GTKWave). Asigură-te că adaugi executabilele în variabila de mediu \`PATH\`.
@@ -41,15 +41,15 @@ Proiectul include un \`Makefile\` pentru a simplifica procesul.
 ### 1. Compilare și Rulare Teste
 Pentru a compila sursele și a rula testbench-ul automat, rulează comanda:
 
-\`\`\`bash
+```bash
 make
-\`\`\`
+```
 *Această comandă va compila fișierele în \`sim_top\` și va executa simularea.*
 
 **Rezultat așteptat în consolă:**
 Dacă totul funcționează corect, vei vedea rezultatele testelor marcate cu \`[PASS]\`:
 
-\`\`\`text
+```text
 --- Test 1: PWM ALIGN_LEFT, compare1=3, period=7 ---
 [PASS] PWM duty aprox. corect: high=19, expected ~20
 
@@ -57,22 +57,22 @@ Dacă totul funcționează corect, vei vedea rezultatele testelor marcate cu \`[
 [PASS] PWM duty aprox. corect: high=20, expected ~20
 
 ...
-\`\`\`
+```
 
 ### 2. Vizualizare Forme de Undă (Waves)
 Pentru a vizualiza semnalele interne și cronogramele, rulează:
 
-\`\`\`bash
+```bash
 make waves
-\`\`\`
+```
 *Aceasta va deschide automat **GTKWave** și va încărca fișierul \`waves.vcd\` generat la pasul anterior.*
 
 ### 3. Curățare (Clean)
 Pentru a șterge fișierele generate (executabilul și fișierul VCD):
 
-\`\`\`bash
+```bash
 make clean
-\`\`\`
+```
 
 ---
 
