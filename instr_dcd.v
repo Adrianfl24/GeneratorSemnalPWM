@@ -14,9 +14,7 @@ module instr_dcd (
     output  [7:0] data_write    // Datele de scris in registre
 );
 
-    // ------------------------------------------------------------------------
     // REGISTRE INTERNE
-    // ------------------------------------------------------------------------
     reg       r_read;
     reg       r_write;
     reg [5:0] r_addr;
@@ -30,9 +28,7 @@ module instr_dcd (
     assign data_out   = r_data_out;
     assign data_write = r_data_write;
 
-    // ------------------------------------------------------------------------
     // FSM (State Machine)
-    // ------------------------------------------------------------------------
     localparam S_CMD  = 1'b0; // Asteptam comanda (Primul byte)
     localparam S_DATA = 1'b1; // Procesam datele (Al doilea byte)
 
@@ -55,9 +51,7 @@ module instr_dcd (
 
             if (byte_sync) begin
                 case (state)
-                    // --------------------------------------------------------
                     // STARE 1: Primire Comanda (Adresa + RW bit)
-                    // --------------------------------------------------------
                     S_CMD: begin
                         // Format comanda: [7]=RW, [6]=Dummy, [5:0]=ADDR
                         rw_bit <= data_in[7];     // 1=Write, 0=Read
@@ -65,9 +59,7 @@ module instr_dcd (
                         state  <= S_DATA;         // Trecem la faza de date
                     end
 
-                    // --------------------------------------------------------
                     // STARE 2: Transfer Date (Write sau Read)
-                    // --------------------------------------------------------
                     S_DATA: begin
                         if (rw_bit) begin
                             // --- OPERATIE SCRIERE ---

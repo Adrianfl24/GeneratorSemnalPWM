@@ -16,9 +16,7 @@ module top(
     output  pwm_out
 );
 
-    // ------------------------------------------------------------------------
     // SEMNALE INTERNE
-    // ------------------------------------------------------------------------
     
     // SPI / Decoder interface
     wire       byte_sync;
@@ -44,9 +42,7 @@ module top(
     wire [15:0] compare1;
     wire [15:0] compare2;
 
-    // ------------------------------------------------------------------------
     // INSTANTIERE MODULE
-    // ------------------------------------------------------------------------
 
     // 1. SPI BRIDGE
     // Conecteaza lumea externa SPI la magistrala interna de date

@@ -22,9 +22,7 @@ module regs (
     output  [15:0] compare2
 );
 
-    // ------------------------------------------------------------------------
     // REGISTRE INTERNE
-    // ------------------------------------------------------------------------
     reg [15:0] r_period;
     reg        r_en;
     reg        r_count_reset;
@@ -35,9 +33,7 @@ module regs (
     reg [15:0] r_compare1;
     reg [15:0] r_compare2;
 
-    // ------------------------------------------------------------------------
     // CONECTARI CATRE IESIRI
-    // ------------------------------------------------------------------------
     assign period      = r_period;
     assign en          = r_en;
     assign count_reset = r_count_reset;
@@ -48,9 +44,7 @@ module regs (
     assign compare1    = r_compare1;
     assign compare2    = r_compare2;
 
-    // ------------------------------------------------------------------------
     // LOGICA DE SCRIERE (Write)
-    // ------------------------------------------------------------------------
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             r_period      <= 16'h0000;
@@ -85,10 +79,7 @@ module regs (
         end
     end
 
-    // ------------------------------------------------------------------------
     // LOGICA DE CITIRE (Read)
-    // ------------------------------------------------------------------------
-    // Multiplexor combinațional mare
     always @(*) begin
         if (!read) begin
             data_read = 8'h00;

@@ -13,9 +13,7 @@ module spi_bridge (
     input   [7:0] data_out
 );
 
-    // ------------------------------------------------------------------------
     // DOMENIUL SPI (SCLK)
-    // ------------------------------------------------------------------------
     reg [2:0] bit_cnt;
     reg [7:0] shift_reg;
     
@@ -23,7 +21,7 @@ module spi_bridge (
     // Este matematic echivalent cu bitul 0 al counter-ului tau.
     reg       toggle_flag; 
     
-    // Buffer pentru a tine datele stabile pana le citeste CLK (Secretul succesului tau)
+    // Buffer pentru a tine datele stabile pana le citeste CLK
     reg [7:0] captured_data;
     
     reg r_miso;
@@ -55,7 +53,7 @@ module spi_bridge (
         end
     end
     
-    // Logica MISO (Exact ca in varianta ta)
+    // Logica MISO
     always @(negedge sclk or negedge rst_n) begin
         if (!rst_n) begin
             r_miso <= 1'b0;
@@ -64,7 +62,7 @@ module spi_bridge (
         end
     end
     
-    // Setup initial MISO (Exact ca in varianta ta)
+    // Setup initial MISO
     always @(negedge cs_n or negedge rst_n) begin
         if (!rst_n) begin
              // nimic
@@ -73,9 +71,7 @@ module spi_bridge (
         end
     end
 
-    // ------------------------------------------------------------------------
     // DOMENIUL SISTEM (CLK)
-    // ------------------------------------------------------------------------
     reg       toggle_sync1;
     reg       toggle_sync2;
     reg       toggle_prev;
@@ -99,7 +95,7 @@ module spi_bridge (
             toggle_prev  <= toggle_sync2;
             
             // 3. Detectam orice schimbare (0->1 sau 1->0)
-            // Asta e echivalent cu detectarea incrementarii counter-ului tau
+            // Asta e echivalent cu detectarea incrementarii unui counter
             r_byte_sync <= 1'b0;
             
             if (toggle_sync2 != toggle_prev) begin

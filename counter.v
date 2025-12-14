@@ -11,18 +11,14 @@ module counter (
     input   [7:0]  prescale
 );
 
-    // ---------------------------
     // Registre interne
-    // ---------------------------
     reg [15:0] count_val_r;
     reg [7:0]  prescale_cnt;
 
-    // Conectăm registrul intern la ieșire
+    // Conectam registrul intern la iesire
     assign count_val = count_val_r;
 
-    // ---------------------------
-    // Logică principală
-    // ---------------------------
+    // Logica principala
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             // Reset asincron (Hardware Reset)
@@ -36,7 +32,7 @@ module counter (
             end else if (en) begin
                 // Logica de Prescaler (Liniar: Divide cu prescale + 1)
                 if (prescale_cnt == prescale) begin
-                    // Prescaler a atins limita, executăm un "tick" de numărare
+                    // Prescaler a atins limita, executam un "tick" de numarare
                     prescale_cnt <= 8'd0;
 
                     if (upnotdown) begin
@@ -53,14 +49,10 @@ module counter (
                             count_val_r <= count_val_r - 1'b1;
                     end
                 end else begin
-                    // Încă nu a trecut timpul, incrementăm prescalerul
+                    // Inca nu a trecut timpul, incrementam prescalerul
                     prescale_cnt <= prescale_cnt + 1'b1;
                 end
             end
-            // else (!en):
-            // Contorul 'îngheață' (păstrează valoarea curentă).
-            // Dacă dorești comportamentul prietenului (reset la disable), 
-            // poți adăuga aici un `else prescale_cnt <= 0;` dar nu e obligatoriu.
         end
     end
 

@@ -9,20 +9,15 @@ module pwm_gen (
     input   [15:0] count_val,
     output         pwm_out
 );
-
-    // Revenim la logica combinationala pentru a avea ZERO latenta
-    // (Necesar pentru a trece Testbench-ul strict)
     reg r_pwm_out;
     assign pwm_out = r_pwm_out;
 
-    // Decodare functii pentru citibilitate
     wire [1:0] mode_sel = functions[1:0]; 
 
     localparam MODE_LEFT_ALIGNED  = 2'b00;
     localparam MODE_RIGHT_ALIGNED = 2'b01;
     localparam MODE_RANGE         = 2'b10;
 
-    // Folosim always @(*) in loc de @(posedge clk)
     always @(*) begin
         // Default value
         r_pwm_out = 1'b0;
